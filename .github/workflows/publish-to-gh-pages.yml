@@ -21,6 +21,11 @@ jobs:
 
     - name: Remove launchSettings.json (to not override ASPNETCORE_ENVIRONMENT)
       run: rm  ${{ env.WEBAPP_PATH }}Properties/launchSettings.json
+
+    - name: Change <base href="" /> in App.razor to match gh repo name
+      run: |
+        REPO_NAME=$(echo "${{ github.repository }}" | awk -F '/' '{print $NF}')
+        sed -i 's/<base href="\/" \/>/<base href="\/'$REPO_NAME'\/" \/>/g' ${{ env.WEBAPP_PATH }}Components/App.razor
     
     # sets up .NET Core SDK
     - name: Setup .NET Core SDK
@@ -35,10 +40,6 @@ jobs:
     - name: Publish .NET Core Project
       run: dotnet publish BlazorTemplate.csproj -c Release -o release --nologo
 
-    - name: Change <base href="" /> in App.razor to match gh repo name
-      run: |
-        REPO_NAME=$(echo "${{ github.repository }}" | awk -F '/' '{print $NF}')
-        sed -i 's/<base href="\/" \/>/<base href="\/'$REPO_NAME'\/" \/>/g' ${{ env.WEBAPP_PATH }}Components/App.razor
 
     - name: Commit wwwroot to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4
