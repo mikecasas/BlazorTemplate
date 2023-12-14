@@ -27,21 +27,11 @@ jobs:
         REPO_NAME=$(echo "${{ github.repository }}" | awk -F '/' '{print $NF}')
         sed -i 's/<base href="\/" \/>/<base href="\/'$REPO_NAME'\/" \/>/g' ${{ env.WEBAPP_PATH }}Components/App.razor
     
-    # sets up .NET Core SDK
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 8.x
-
-    - name: List the contents to see what folder directory I am in
-      run: ls
-
-    # publishes Blazor project to the release-folder
-    - name: Publish .NET Core Project
-      run: dotnet publish BlazorTemplate.csproj -c Release -o release --nologo
-
+    - name: Run webapp and generate static files
+      run: |
+          dotnet run --project ${{ env.WEBAPP_PATH }}${{env.WEBAPP_CSPROJ}}  --configuration Release
 
     - name: Commit wwwroot to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4
       with:
-       folder: release/wwwroot
+       folder: ${{ env.WEBAPP_PATH }}output
