@@ -1,3 +1,4 @@
+using BlazorStatic;
 using BlazorTemplate.Components;
 
 namespace BlazorTemplate
@@ -10,6 +11,10 @@ namespace BlazorTemplate
 
             // Add services to the container.
             builder.Services.AddRazorComponents();
+
+            builder.Services.AddBlazorStaticService(opt =>
+            {
+            });
 
             var app = builder.Build();
 
@@ -27,6 +32,8 @@ namespace BlazorTemplate
             app.UseAntiforgery();
 
             app.MapRazorComponents<App>();
+
+            app.UseBlazorStaticGenerator(shutdownApp: !app.Environment.IsDevelopment());
 
             app.Run();
         }
