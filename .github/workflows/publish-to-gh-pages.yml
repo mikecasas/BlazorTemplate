@@ -1,0 +1,31 @@
+name: Deploy to GitHub Pages
+
+# Run workflow on every push to the master branch
+on:
+  push:
+    branches: [ master ]
+env:
+  ASPNETCORE_ENVIRONMENT: Production
+  WEBAPP_PATH: ./
+  WEBAPP_CSPROJ: BlazorTemplate.csproj
+
+jobs:
+  deploy-to-github-pages:
+    # use ubuntu-latest image to run steps on
+    runs-on: ubuntu-latest
+    steps:
+    # uses GitHub's checkout action to checkout code form the master branch
+    - uses: actions/checkout@v2
+    
+    # sets up .NET Core SDK 3.1
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 8.x
+
+    - name: List the contents to see what folder directory I am in
+      run: ls
+
+    # publishes Blazor project to the release-folder
+    - name: Publish .NET Core Project
+      run: dotnet publish BlazorTemplate.csproj -c Release -o release --nologo
