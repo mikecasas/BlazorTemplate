@@ -13,11 +13,16 @@ jobs:
   deploy-to-github-pages:
     # use ubuntu-latest image to run steps on
     runs-on: ubuntu-latest
+    permissions:
+      contents: write 
     steps:
     # uses GitHub's checkout action to checkout code form the master branch
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+
+    - name: Remove launchSettings.json (to not override ASPNETCORE_ENVIRONMENT)
+        run: rm  ${{ env.WEBAPP_PATH }}Properties/launchSettings.json
     
-    # sets up .NET Core SDK 3.1
+    # sets up .NET Core SDK
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1
       with:
@@ -36,8 +41,6 @@ jobs:
         sed -i 's/<base href="\/" \/>/<base href="\/'$REPO_NAME'\/" \/>/g' ${{ env.WEBAPP_PATH }}Components/App.razor
 
     - name: Commit wwwroot to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@releases/v4
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: release/wwwroot
+       folder: release/wwwroot
